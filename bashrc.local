@@ -1,0 +1,187 @@
+#alias du='du -sh'
+#alias df='df -h'
+
+#alias lsalias='cat ~/.bashrc.aliases'
+#alias vimrclocals='vim -p ~/.vimrc*.local'
+alias lslocal='cat ~/.bashrc.local'
+alias vilocal='vim ~/.bashrc.local'
+#alias vialias='vim ~/.bashrc.aliases'
+alias tree2='tree -L 2'
+alias tree3='tree -L 3'
+
+alias rcsh="source ~/.${SHELL##*/}rc"
+alias findsrc='find . -name "*.[ch]" -o -name "Makefile" -o -name "Kconfig"'
+
+
+
+function cdf() {
+    if [[ $# -lt 1 ]]; then
+        file=`fzf`
+    else
+        file=`fzf -q "$*"`
+    fi
+    dir="`dirname $file`"
+    [ -d $dir ] && cd $dir
+}
+
+#alias cdf='`fzf` | dirname |xargs cd'
+#alias catf='`fzf` |xargs cat'
+
+function catf() {
+    if [[ $# -lt 1 ]]; then
+        file=`fzf`
+    else
+        file=`fzf -q "$*"`
+    fi
+    [ -z $file ] && return 1
+    cat $file
+}
+
+function vif() {
+    if [[ $# -lt 1 ]]; then
+        file=`fzf`
+    else
+        file=`fzf -q "$*"`
+    fi
+    [ -z $file ] && return 1
+    vim $file
+}
+
+function vidf() {
+    [ $# -lt 1 ] && echo "Usage $0 [anotherDir]" && return 1
+    nextDir=$1
+    if [[ $# -lt 2 ]]; then
+        file="`fzf`"
+    else
+        shift
+        file=`fzf -q "$*"`
+    fi
+    [ -z $file ] && return 1
+    nextFile="${nextDir}/${file}"
+    vimdiff $file $nextFile 
+}
+
+function vidff() {
+    file1="`fzf`"
+    file2="`fzf`"
+    [ -z $file1 ] || [ -z $file2 ] && return 1
+    vimdiff $file1 $file2
+}
+
+######################   bakup #######################################
+
+function bak() {
+    file=$1
+    [ -z $file ] && return 1
+    cp $file "${file}.bak"
+}
+
+function bakf() {
+    if [[ $# -lt 1 ]]; then
+        file="`fzf`"
+    else
+        file=`fzf -q "$*"`
+    fi
+    [ -z $file ] && return 1
+    cp $file "${file}.bak"
+}
+
+function bakall() {
+    for f in $@
+    do
+        echo bakup $f
+        bak $f
+    done
+}
+
+function unbak() {
+    file=$1
+    [ -z $file ] && return 1
+    cp $file "${file%.bak}"
+}
+
+function unbakf() {
+    if [[ $# -lt 1 ]]; then
+        file="`fzf`"
+    else
+        file=`fzf -q "$*"`
+    fi
+    [ -z $file ] && return 1
+    cp $file "${file%.bak}"
+}
+
+function unbakAll() {
+    for f in $@
+    do
+        echo bakup $f
+        unbak $f
+    done
+}
+
+###################### end  bakup #######################################
+
+###################### start tar ####################################
+
+function tarc() {
+    if [[ $# -gt 1 ]]; then
+        tarFile="files.tar"
+    else
+        tarFile="$1.tar"
+    fi
+    tar cvf $tarFile $@
+}
+
+function tarcj() {
+    if [[ $# -gt 1 ]]; then
+        tarFile="files.tar.bz2"
+    else
+        tarFile="$1.tar.bz2"
+    fi
+    tar cvjf $tarFile $@
+}
+
+function tarx() {
+    [ $# -gt 1 ] && mkdir -p tmpTar
+    for f in $@
+    do
+        if [[ $# -lt 1 ]]; then
+            [ -d tmpTar ] || mkdir -p tmpTar
+            tar xvf $f -C "tmpTar"
+        else
+            tar xvf $f
+        fi
+    done
+}
+
+function tarxf() {
+    if [[ $# -lt 1 ]]; then
+        file=`fzf`
+        tar xf $file
+    else
+        targetDir=$2
+        [ -d $targetDir ] || mkdir -p $targetDir
+        tar xvf `fzf` -C $targetDir
+    fi
+}
+
+
+function diffFromList() {
+    [ $# -lt 3 ] && return 1
+    list=$1
+    oldDir=$2
+    newDir=$3
+    for f in `cat $list`
+    do
+        #echo "compare : $f "
+        diff -Bbwq "$oldDir/$f" "$newDir/$f"
+    done
+}
+
+#function findFileByText() {
+    #ag -l "$*" | grep --color "\.[ch]"
+#}
+
+#function findFileByName() {
+    ##ag -g "$*" | grep --color "\.[ch]"
+    #findsrc | grep --color "$1"
+#}
