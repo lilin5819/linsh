@@ -1,0 +1,2 @@
+# linsh
+shell local configs
