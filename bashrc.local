@@ -8,9 +8,14 @@ alias vilocal='vim ~/.bashrc.local'
 #alias vialias='vim ~/.bashrc.aliases'
 alias tree2='tree -L 2'
 alias tree3='tree -L 3'
+alias gsvn='git svn'
 
 alias rcsh="source ~/.${SHELL##*/}rc"
 alias findsrc='find . -name "*.[ch]" -o -name "Makefile" -o -name "Kconfig"'
+
+alias vpnstatus="sudo systemctl status pptpd xl2tpd isc-dhcp-server"
+alias vpnstart="sudo systemctl start pptpd xl2tpd isc-dhcp-server"
+alias vpnrestart="sudo systemctl restart pptpd xl2tpd isc-dhcp-server"
 
 
 
