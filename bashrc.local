@@ -18,13 +18,23 @@ alias vpnstart="sudo systemctl start pptpd xl2tpd isc-dhcp-server"
 alias vpnrestart="sudo systemctl restart pptpd xl2tpd isc-dhcp-server"
 
 
-
-function cdf() {
+function Fzf() {
     if [[ $# -lt 1 ]]; then
         file=`fzf`
     else
         file=`fzf -q "$*"`
     fi
+    echo $file
+}
+
+
+function fcd() {
+#    if [[ $# -lt 1 ]]; then
+        #file=`fzf`
+    #else
+        #file=`fzf -q "$*"`
+#    fi
+    file=`Fzf $@`
     dir="`dirname $file`"
     [ -d $dir ] && cd $dir
 }
@@ -32,27 +42,29 @@ function cdf() {
 #alias cdf='`fzf` | dirname |xargs cd'
 #alias catf='`fzf` |xargs cat'
 
-function catf() {
-    if [[ $# -lt 1 ]]; then
-        file=`fzf`
-    else
-        file=`fzf -q "$*"`
-    fi
+function fcat() {
+    #if [[ $# -lt 1 ]]; then
+        #file=`fzf`
+    #else
+        #file=`fzf -q "$*"`
+    #fi
+    file=`Fzf $@`
     [ -z $file ] && return 1
     cat $file
 }
 
-function vif() {
-    if [[ $# -lt 1 ]]; then
-        file=`fzf`
-    else
-        file=`fzf -q "$*"`
-    fi
+function fvi() {
+    #if [[ $# -lt 1 ]]; then
+        #file=`fzf`
+    #else
+        #file=`fzf -q "$*"`
+    #fi
+    file=`Fzf $@`
     [ -z $file ] && return 1
     vim $file
 }
 
-function vidf() {
+function fvid() {
     [ $# -lt 1 ] && echo "Usage $0 [anotherDir]" && return 1
     nextDir=$1
     if [[ $# -lt 2 ]]; then
@@ -66,7 +78,7 @@ function vidf() {
     vimdiff $file $nextFile 
 }
 
-function vidff() {
+function fvidf() {
     file1="`fzf`"
     file2="`fzf`"
     [ -z $file1 ] || [ -z $file2 ] && return 1
@@ -81,12 +93,13 @@ function bak() {
     cp $file "${file}.bak"
 }
 
-function bakf() {
-    if [[ $# -lt 1 ]]; then
-        file="`fzf`"
-    else
-        file=`fzf -q "$*"`
-    fi
+function fbak() {
+    #if [[ $# -lt 1 ]]; then
+        #file="`fzf`"
+    #else
+        #file=`fzf -q "$*"`
+    #fi
+    file=`Fzf $@`
     [ -z $file ] && return 1
     cp $file "${file}.bak"
 }
@@ -106,11 +119,12 @@ function unbak() {
 }
 
 function unbakf() {
-    if [[ $# -lt 1 ]]; then
-        file="`fzf`"
-    else
-        file=`fzf -q "$*"`
-    fi
+    #if [[ $# -lt 1 ]]; then
+        #file="`fzf`"
+    #else
+        #file=`fzf -q "$*"`
+    #fi
+    file=`Fzf $@`
     [ -z $file ] && return 1
     cp $file "${file%.bak}"
 }
@@ -190,3 +204,17 @@ function diffFromList() {
     ##ag -g "$*" | grep --color "\.[ch]"
     #findsrc | grep --color "$1"
 #}
+
+
+function fpath() {
+    oldpath=`pwd`
+    #cd /home/lilin/PRJ/note.git
+    cd $1 ; shift
+    file=`Fzf $@`
+    [ -f $file ] && vim $file
+    cd $oldpath
+}
+
+function fnote() {
+    fpath /home/lilin/PRJ/note.git $@
+}
