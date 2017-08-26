@@ -24,7 +24,7 @@ function Fzf() {
     else
         file=`fzf -q "$*"`
     fi
-    echo $file
+    [ "$file" != "" ] && echo $file
 }
 
 
@@ -211,7 +211,7 @@ function fpath() {
     #cd /home/lilin/PRJ/note.git
     cd $1 ; shift
     file=`Fzf $@`
-    [ -f $file ] && vim $file
+    [ -n "$file" ] && echo "即将打开 $file" && vim $file
     cd $oldpath
 }
 
