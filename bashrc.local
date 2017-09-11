@@ -11,15 +11,21 @@ alias tree3='tree -L 3'
 alias gsvn='git svn'
 
 alias rcsh="source ~/.${SHELL##*/}rc"
-alias findsrc='find . -name "*.[ch]" -o -name "Makefile" -o -name "Kconfig"'
+alias findsrc='find . -name "*.[ch]"'
 
 alias vpnstatus="sudo systemctl status pptpd xl2tpd isc-dhcp-server"
 alias vpnstart="sudo systemctl start pptpd xl2tpd isc-dhcp-server"
 alias vpnrestart="sudo systemctl restart pptpd xl2tpd isc-dhcp-server"
+alias sshkeygen="ssh-keygen -t rsa -C"
+#export DISPLAY=192.168.56.1:0.0
+#xhost +
+
+alias gitl="git log --oneline --name-status"
+
+export PATH="$PATH:/home/lilin/bin"
 
 
-
-function cdf() {
+function fcd() {
     if [[ $# -lt 1 ]]; then
         file=`fzf`
     else
@@ -32,7 +38,7 @@ function cdf() {
 #alias cdf='`fzf` | dirname |xargs cd'
 #alias catf='`fzf` |xargs cat'
 
-function catf() {
+function fcat() {
     if [[ $# -lt 1 ]]; then
         file=`fzf`
     else
@@ -42,7 +48,7 @@ function catf() {
     cat $file
 }
 
-function vif() {
+function fvi() {
     if [[ $# -lt 1 ]]; then
         file=`fzf`
     else
@@ -52,7 +58,7 @@ function vif() {
     vim $file
 }
 
-function vidf() {
+function fvidf() {
     [ $# -lt 1 ] && echo "Usage $0 [anotherDir]" && return 1
     nextDir=$1
     if [[ $# -lt 2 ]]; then
@@ -66,7 +72,7 @@ function vidf() {
     vimdiff $file $nextFile 
 }
 
-function vidff() {
+function fvidff() {
     file1="`fzf`"
     file2="`fzf`"
     [ -z $file1 ] || [ -z $file2 ] && return 1
@@ -78,17 +84,25 @@ function vidff() {
 function bak() {
     file=$1
     [ -z $file ] && return 1
-    cp $file "${file}.bak"
+    [ -f $file ] && sudo cp -p $file "${file}.bak"
+    [ -d $file ] && sudo cp -rp $file "${file}.bak"
 }
 
-function bakf() {
+function mvbak() {
+    file=$1
+    [ -z $file ] && return 1
+    sudo mv $file "${file}.bak"
+}
+
+function fbak() {
     if [[ $# -lt 1 ]]; then
         file="`fzf`"
     else
         file=`fzf -q "$*"`
     fi
     [ -z $file ] && return 1
-    cp $file "${file}.bak"
+    [ -f $file ] && sudo cp -p $file "${file}.bak"
+    [ -d $file ] && sudo cp -rp $file "${file}.bak"
 }
 
 function bakall() {
@@ -175,10 +189,31 @@ function diffFromList() {
     list=$1
     oldDir=$2
     newDir=$3
+    rm differs.txt
     for f in `cat $list`
     do
         #echo "compare : $f "
-        diff -Bbwq "$oldDir/$f" "$newDir/$f"
+        f=${f#./}
+        diff -Bbwq "$oldDir/$f" "$newDir/$f" || echo $f >> differs.txt
+    done
+    nlines=`wc -l differs.txt | cut -d ' ' -f 1`
+    while [ -n $nlines ];
+    do
+        for file in `cat differs.txt`
+        do
+            echo "对比: $file ? y/n"
+            read -t 10 watch_the_diff
+            case "${watch_the_diff}" in
+                n)
+                    echo "退出"
+                    return 1
+                    ;;
+                *)
+                    vimdiff "$oldDir/$file" "$newDir/$file"
+                    nlines = `expr $nlines - 1`
+                    ;;
+            esac
+        done
     done
 }
 
@@ -190,3 +225,38 @@ function diffFromList() {
     ##ag -g "$*" | grep --color "\.[ch]"
     #findsrc | grep --color "$1"
 #}
+
+
+#########################  work ################################
+function einit() {
+    rm -rf ecos-work/*_build
+    rm -rf ecos-work/*_install
+    echo "清除脏空间"
+    make clean
+    sudo chmod -R 777 *
+}
+
+function econfig() {
+    echo "初始化"
+    make tsfile=$1 prepare
+    echo "配置"
+    make config
+}
+
+function emake() {
+    target=$1
+    einit
+    econfig $target && make
+}
+
+function edump() {
+    echo "objdump ...."
+    echo "大概三分钟"
+    [ -f ./ecos-work/AP/appimg ] && mips-linux-gnu-objdump -S ./ecos-work/AP/appimg > ./Exception
+}
+
+function cscopefiles() {
+    ctags -R
+    find . -name "*.[ch]" > cscope.files
+    cscope -Rbkq
+}
