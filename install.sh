@@ -6,4 +6,7 @@
 # Distributed under terms of the MIT license.
 #
 
-sudo ln -srf bashrc.local ~/.bashrc.local
+ln -srf bashrc.local ~/.bashrc.local
+echo "[ -f ~/.bashrc.local ] && source ~/.bashrc.local" >> ~/.bashrc
+
+source ~/.bashrc

@@ -25,12 +25,23 @@ alias gitl="git log --oneline --name-status"
 export PATH="$PATH:/home/lilin/bin"
 
 
-function fcd() {
+function Fzf() {
     if [[ $# -lt 1 ]]; then
         file=`fzf`
     else
         file=`fzf -q "$*"`
     fi
+    [ "$file" != "" ] && echo $file
+}
+
+
+function fcd() {
+#    if [[ $# -lt 1 ]]; then
+        #file=`fzf`
+    #else
+        #file=`fzf -q "$*"`
+#    fi
+    file=`Fzf $@`
     dir="`dirname $file`"
     [ -d $dir ] && cd $dir
 }
@@ -39,21 +50,13 @@ function fcd() {
 #alias catf='`fzf` |xargs cat'
 
 function fcat() {
-    if [[ $# -lt 1 ]]; then
-        file=`fzf`
-    else
-        file=`fzf -q "$*"`
-    fi
+    file=`Fzf $@`
     [ -z $file ] && return 1
     cat $file
 }
 
 function fvi() {
-    if [[ $# -lt 1 ]]; then
-        file=`fzf`
-    else
-        file=`fzf -q "$*"`
-    fi
+    file=`Fzf $@`
     [ -z $file ] && return 1
     vim $file
 }
@@ -95,11 +98,7 @@ function mvbak() {
 }
 
 function fbak() {
-    if [[ $# -lt 1 ]]; then
-        file="`fzf`"
-    else
-        file=`fzf -q "$*"`
-    fi
+    file=`Fzf $@`
     [ -z $file ] && return 1
     [ -f $file ] && sudo cp -p $file "${file}.bak"
     [ -d $file ] && sudo cp -rp $file "${file}.bak"
@@ -120,11 +119,7 @@ function unbak() {
 }
 
 function unbakf() {
-    if [[ $# -lt 1 ]]; then
-        file="`fzf`"
-    else
-        file=`fzf -q "$*"`
-    fi
+    file=`Fzf $@`
     [ -z $file ] && return 1
     cp $file "${file%.bak}"
 }
@@ -227,6 +222,7 @@ function diffFromList() {
 #}
 
 
+<<<<<<< HEAD
 #########################  work ################################
 function einit() {
     rm -rf ecos-work/*_build
@@ -259,4 +255,17 @@ function cscopefiles() {
     ctags -R
     find . -name "*.[ch]" > cscope.files
     cscope -Rbkq
+}
+
+function fpath() {
+    oldpath=`pwd`
+    #cd /home/lilin/PRJ/note.git
+    cd $1 ; shift
+    file=`Fzf $@`
+    [ -n "$file" ] && echo "即将打开 $file" && vim $file
+    cd $oldpath
+}
+
+function fnote() {
+    fpath /home/lilin/PRJ/note.git $@
 }
