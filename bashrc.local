@@ -22,7 +22,7 @@ alias sshkeygen="ssh-keygen -t rsa -C"
 
 alias gitl="git log --oneline --name-status"
 
-export PATH="$PATH:/home/lilin/bin"
+export PATH="/home/lilin/bin:$PATH"
 
 
 function Fzf() {
@@ -222,7 +222,6 @@ function diffFromList() {
 #}
 
 
-<<<<<<< HEAD
 #########################  work ################################
 function einit() {
     rm -rf ecos-work/*_build
