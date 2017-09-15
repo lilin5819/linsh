@@ -7,6 +7,6 @@
 #
 
 ln -srf bashrc.local ~/.bashrc.local
-echo "[ -f ~/.bashrc.local ] && source ~/.bashrc.local" >> ~/.bashrc
+echo "[ -f ~/.bashrc.local ] && source ~/.bashrc.local" >> ~/.${SHELL##*/}rc
 
-source ~/.bashrc
+source ~/.${SHELL##*/}rc

@@ -22,7 +22,7 @@ alias sshkeygen="ssh-keygen -t rsa -C"
 
 alias gitl="git log --oneline --name-status"
 
-export PATH="/home/lilin/bin:$PATH"
+export PATH=~/bin:$PATH
 
 
 function Fzf() {
@@ -267,4 +267,12 @@ function fpath() {
 
 function fnote() {
     fpath /home/lilin/PRJ/note.git $@
+}
+
+function lsys() {
+    lsb_release -a
+}
+
+function lversion() {
+    lsb_release -d | sed 's/Description:[\t ]*\(.*\)/\1/g'
 }
